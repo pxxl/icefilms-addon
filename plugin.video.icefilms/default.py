@@ -1705,27 +1705,29 @@ def PART(scrap,sourcenumber,args,cookie,source_tag):
  
                    hoster = determine_source(url)
  
-                   if hoster:
-                       partname='Part '+ partnum
-                       fullname=sourcestring + ' | ' + hoster[1] + ' | ' + source_tag + partname
-                       logo = hoster[2]
- 
-                       try:
-                           sources = eval(cache.get("source"+str(sourcenumber)+"parts"))
-                       except:
-                           sources = {partnum: url}
-                           addon.log('sources havent been set yet...'  )
- 
-                       sources[partnum] = url
-                       cache.delete("source"+str(sourcenumber)+"parts")
-                       cache.set("source"+str(sourcenumber)+"parts", repr(sources))
-                       stacked = str2bool(addon.get_setting('stack-multi-part'))
- 
-                       if stacked and partnum == '1':
-                           fullname = fullname.replace('Part 1', 'Multiple Parts')
-                           addExecute(fullname,url,get_default_action(),logo,stacked)
-                       elif not stacked:
-                           addExecute(fullname,url,get_default_action(),logo)
+                   if not hoster:
+                       continue
+
+                   partname='Part '+ partnum
+                   fullname=sourcestring + ' | ' + hoster[1] + ' | ' + source_tag + partname
+                   logo = hoster[2]
+
+                   try:
+                       sources = eval(cache.get("source"+str(sourcenumber)+"parts"))
+                   except:
+                       sources = {partnum: url}
+                       addon.log('sources havent been set yet...'  )
+
+                   sources[partnum] = url
+                   cache.delete("source"+str(sourcenumber)+"parts")
+                   cache.set("source"+str(sourcenumber)+"parts", repr(sources))
+                   stacked = str2bool(addon.get_setting('stack-multi-part'))
+
+                   if stacked and partnum == '1':
+                       fullname = fullname.replace('Part 1', 'Multiple Parts')
+                       addExecute(fullname,url,get_default_action(),logo,stacked)
+                   elif not stacked:
+                       addExecute(fullname,url,get_default_action(),logo)
  
      # if source does not have multiple parts...
      else:
