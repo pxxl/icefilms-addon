@@ -1682,62 +1682,63 @@ def PART(scrap,sourcenumber,args,cookie,source_tag):
      #check if source exists
      sourcestring='Source #'+sourcenumber
      checkforsource = re.search(sourcestring, scrap)
-         
-     #if source exists proceed.
-     if checkforsource:
+ 
+     #if source doesn't exist stop.
+     if not checkforsource:
+         return
           
-          #check if source contains multiple parts
-          multiple_part = re.search('<p>Source #'+sourcenumber+':', scrap)
-          
-          if multiple_part:
-               addon.log(sourcestring+' has multiple parts')
-               #get all text under source if it has multiple parts
-               multi_part_source=re.compile('<p>Source #'+sourcenumber+': (.+?)PART 1(.+?)</i><p>').findall(scrap)
-
-               #put scrape back together
-               for sourcescrape1,sourcescrape2 in multi_part_source:
-                    scrape=sourcescrape1 + 'PART 1' + sourcescrape2
-                    pair = re.compile("onclick='go\((\d+)\)'>PART\s+(\d+)").findall(scrape)
-
-                    for id, partnum in pair:
-                        url = GetSource(id, args, cookie)
-
-                        hoster = determine_source(url)
-
-                        if hoster:
-                            partname='Part '+ partnum
-                            fullname=sourcestring + ' | ' + hoster[1] + ' | ' + source_tag + partname
-                            logo = hoster[2]
-
-                            try:
-                                sources = eval(cache.get("source"+str(sourcenumber)+"parts"))
-                            except:
-                                sources = {partnum: url}
-                                addon.log('sources havent been set yet...'  )
-
-                            sources[partnum] = url
-                            cache.delete("source"+str(sourcenumber)+"parts")
-                            cache.set("source"+str(sourcenumber)+"parts", repr(sources))
-                            stacked = str2bool(addon.get_setting('stack-multi-part'))
-
-                            if stacked and partnum == '1':
-                                fullname = fullname.replace('Part 1', 'Multiple Parts')
-                                addExecute(fullname,url,get_default_action(),logo,stacked)
-                            elif not stacked:
-                                addExecute(fullname,url,get_default_action(),logo)                                                
-
-          # if source does not have multiple parts...
-          else:
-               # find corresponding '<a rel=?' entry and add as a one-link source
-               source5=re.compile('<a\s+rel='+sourcenumber+'.+?onclick=\'go\((\d+)\)\'>Source\s+#'+sourcenumber+':').findall(scrap)
-
-               for id in source5:
-                    url = GetSource(id, args, cookie)
-                    
-                    hoster = determine_source(url)
-                    if hoster:
-                        fullname=sourcestring + ' | ' + hoster[1] + source_tag + ' | Full '
-                        addExecute(fullname,url,get_default_action(),hoster[2])
+     #check if source contains multiple parts
+     multiple_part = re.search('<p>Source #'+sourcenumber+':', scrap)
+ 
+     if multiple_part:
+          addon.log(sourcestring+' has multiple parts')
+          #get all text under source if it has multiple parts
+          multi_part_source=re.compile('<p>Source #'+sourcenumber+': (.+?)PART 1(.+?)</i><p>').findall(scrap)
+ 
+          #put scrape back together
+          for sourcescrape1,sourcescrape2 in multi_part_source:
+               scrape=sourcescrape1 + 'PART 1' + sourcescrape2
+               pair = re.compile("onclick='go\((\d+)\)'>PART\s+(\d+)").findall(scrape)
+ 
+               for id, partnum in pair:
+                   url = GetSource(id, args, cookie)
+ 
+                   hoster = determine_source(url)
+ 
+                   if hoster:
+                       partname='Part '+ partnum
+                       fullname=sourcestring + ' | ' + hoster[1] + ' | ' + source_tag + partname
+                       logo = hoster[2]
+ 
+                       try:
+                           sources = eval(cache.get("source"+str(sourcenumber)+"parts"))
+                       except:
+                           sources = {partnum: url}
+                           addon.log('sources havent been set yet...'  )
+ 
+                       sources[partnum] = url
+                       cache.delete("source"+str(sourcenumber)+"parts")
+                       cache.set("source"+str(sourcenumber)+"parts", repr(sources))
+                       stacked = str2bool(addon.get_setting('stack-multi-part'))
+ 
+                       if stacked and partnum == '1':
+                           fullname = fullname.replace('Part 1', 'Multiple Parts')
+                           addExecute(fullname,url,get_default_action(),logo,stacked)
+                       elif not stacked:
+                           addExecute(fullname,url,get_default_action(),logo)
+ 
+     # if source does not have multiple parts...
+     else:
+          # find corresponding '<a rel=?' entry and add as a one-link source
+          source5=re.compile('<a\s+rel='+sourcenumber+'.+?onclick=\'go\((\d+)\)\'>Source\s+#'+sourcenumber+':').findall(scrap)
+ 
+          for id in source5:
+               url = GetSource(id, args, cookie)
+ 
+               hoster = determine_source(url)
+               if hoster:
+                   fullname=sourcestring + ' | ' + hoster[1] + source_tag + ' | Full '
+                   addExecute(fullname,url,get_default_action(),hoster[2])
 
 
 def GetSource(id, args, cookie):
