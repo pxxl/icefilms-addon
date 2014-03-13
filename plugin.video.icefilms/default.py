@@ -86,7 +86,7 @@ sys.path.append( os.path.join( icepath, 'resources', 'lib' ) )
 import container_urls,clean_dirs,htmlcleaner
 import debridroutines
 
-from cleaners import *
+from cleaners import CLEANUP, CLEANSEARCH, CLEANUP_FOR_META
 from BeautifulSoup import BeautifulSoup
 from xgoogle.search import GoogleSearch
 
@@ -103,7 +103,7 @@ except:
 cache = StorageServer.StorageServer(addon_id)
 
 # Resolvers - Custom to Icefilms
-from resolvers import *  
+import resolvers
 
 ####################################################
 
@@ -2153,7 +2153,7 @@ def Handle_Vidlink(url):
                    return link
 
     #Dynamic call to proper resolve function returned from determine_source()
-    return getattr(sys.modules[__name__], "%s" % hoster[3])(url)
+    return getattr(resolvers, "%s" % hoster[3])(url)
 
 
 def PlayFile(name,url):
