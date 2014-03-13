@@ -1648,6 +1648,10 @@ def addCatDir(url,dvdrip,hd720p,dvdscreener,r5r6):
                 #addDir('R5/R6 DVDRip',url,104,os.path.join(art_path,'source_types','r5r6.png'), imdb=imdbnum)
 
 def determine_source(url):
+    hoster = re.search('https?://[www\.]*([^/]+)/', url)
+
+    if not hoster:
+        return None
 
     host_list = [('2shared.com', '2S', handle_file('shared2pic',''), 'SHARED2_HANDLER'),
                 ('180upload.com', '180', handle_file('180pic',''), 'resolve_180upload'),
@@ -1665,17 +1669,14 @@ def determine_source(url):
                 ('megafiles.se', 'MF', '', 'resolve_megafiles')
                 ]
 
-    hoster = re.search('https?://[www\.]*([^/]+)/', url)
+    domain = hoster.group(1)
 
-    if hoster:
-        source_info = {}
-        domain = hoster.group(1)
-       
-        try:
-            host_index = [y[0] for y in host_list].index(domain)      
-            return host_list[host_index]
-        except:
-            return None
+    try:
+        host, = [y for y in host_list if domain == y[0]]
+    except ValueError:
+        return None
+    else:
+        return host
 
 
 def PART(scrap,sourcenumber,args,cookie,source_tag):
