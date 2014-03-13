@@ -1712,15 +1712,16 @@ def PART(scrap,sourcenumber,args,cookie,source_tag):
                    fullname=sourcestring + ' | ' + hoster[1] + ' | ' + source_tag + partname
                    logo = hoster[2]
 
+                   cache_key = "source" + str(sourcenumber) + "parts"
                    try:
-                       sources = eval(cache.get("source"+str(sourcenumber)+"parts"))
+                       sources = eval(cache.get(cache_key))
                    except:
                        sources = {partnum: url}
                        addon.log('sources havent been set yet...'  )
 
                    sources[partnum] = url
-                   cache.delete("source"+str(sourcenumber)+"parts")
-                   cache.set("source"+str(sourcenumber)+"parts", repr(sources))
+                   cache.delete(cache_key)
+                   cache.set(cache_key, repr(sources))
                    stacked = str2bool(addon.get_setting('stack-multi-part'))
 
                    if stacked and partnum == '1':
